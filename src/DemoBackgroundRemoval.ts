@@ -1,38 +1,57 @@
-import { LumaSplatsSemantics, LumaSplatsThree } from "@lumaai/luma-web";
-import { DemoProps } from ".";
-import { loadEnvironment } from "./util/Environment";
+import { LumaSplatsSemantics, LumaSplatsThree } from "@lumaai/luma-web"
+import { DemoProps } from "."
+import { loadEnvironment } from "./util/Environment"
+import * as THREE from "three"
 
 export function DemoBackgroundRemoval(props: DemoProps) {
-	let { renderer, scene, gui } = props;
+  let { renderer, scene, gui } = props
+  const pointer = new THREE.Vector2()
+  const raycaster = new THREE.Raycaster()
 
-	let splats = new LumaSplatsThree({
-		// Jules Desbois La Femme à l’arc @HouseofJJD
-		source: 'https://lumalabs.ai/capture/1b5f3e33-3900-4398-8795-b585ae13fd2d',
-		enableThreeShaderIntegration: false,
-	});
+  const onMouseMove = (event: any) => {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+    console.log("Running onMouseMove")
+    raycaster.setFromCamera(pointer, props.camera)
+    const intersects = raycaster.intersectObjects(props.scene.children)
 
-	scene.add(splats);
-	
-	let layersEnabled = {
-		Background: false,
-		Foreground: true,
-	}
+    for (let i = 0; i < intersects.length; i++) {
+      const object = intersects[i].object
+      console.log(object.name)
+    }
+  }
 
-	function updateSemanticMask() {
-		splats.semanticsMask =
-			(layersEnabled.Background ? LumaSplatsSemantics.BACKGROUND : 0) |
-			(layersEnabled.Foreground ? LumaSplatsSemantics.FOREGROUND : 0);
-	}
+  let splats = new LumaSplatsThree({
+    // Jules Desbois La Femme à l’arc @HouseofJJD
+    source: "https://lumalabs.ai/capture/860743ca-e209-419d-a76a-dcedc5f5fa07",
+    enableThreeShaderIntegration: false,
+  })
 
-	updateSemanticMask();
+  scene.add(splats)
 
-	gui.add(layersEnabled, 'Background').onChange(updateSemanticMask);
+  let layersEnabled = {
+    Background: false,
+    Foreground: true,
+  }
 
-	loadEnvironment(renderer, scene, 'assets/venice_sunset_1k.hdr');
+  function updateSemanticMask() {
+    splats.semanticsMask =
+      (layersEnabled.Background ? LumaSplatsSemantics.BACKGROUND : 0) |
+      (layersEnabled.Foreground ? LumaSplatsSemantics.FOREGROUND : 0)
+  }
 
-	return {
-		dispose: () => {
-			splats.dispose();
-		}
-	}
+  updateSemanticMask()
+
+  gui.add(layersEnabled, "Background").onChange(updateSemanticMask)
+
+  loadEnvironment(renderer, scene, "assets/venice_sunset_1k.hdr")
+
+  window.addEventListener("mousemove", onMouseMove, false)
+  windows.addEventListener("pointerdo")
+
+  return {
+    dispose: () => {
+      splats.dispose()
+    },
+  }
 }
