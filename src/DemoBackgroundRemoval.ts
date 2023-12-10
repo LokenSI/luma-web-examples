@@ -1,4 +1,8 @@
-import { LumaSplatsSemantics, LumaSplatsThree } from "@lumaai/luma-web"
+import {
+  LumaSplatsSemantics,
+  LumaSplatsThree,
+  LumaSplatsWebGL,
+} from "@lumaai/luma-web"
 import { DemoProps } from "."
 import { loadEnvironment } from "./util/Environment"
 import * as THREE from "three"
@@ -47,7 +51,6 @@ export function DemoBackgroundRemoval(props: DemoProps) {
   loadEnvironment(renderer, scene, "assets/venice_sunset_1k.hdr")
 
   window.addEventListener("mousemove", onMouseMove, false)
-  windows.addEventListener("pointerdo")
 
   return {
     dispose: () => {
